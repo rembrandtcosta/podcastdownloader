@@ -6,6 +6,9 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+        "github.com/rembrandtcosta/podcastdownloader/db"
+	"github.com/rembrandtcosta/podcastdownloader/handler"
 )
 
 func printUsage() {
@@ -39,13 +42,13 @@ func main() {
     printUsage()
   }
 
-  db, err := DbConnect()
+  db, err := database.DbConnect()
   if err != nil {
     log.Println(err)
     os.Exit(0)
   }
 
-  handler := NewActionHandler(db)
+  handler := handler.NewActionHandler(db)
   err = handler.InitHandler()
   if err != nil {
     log.Fatal(err)
