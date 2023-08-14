@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -49,11 +50,11 @@ func (h *ActionHandler) InitHandler() error {
   return nil
 }
 
-func (h *ActionHandler) AddPodcast(rssFeedURL string) {
+func (h *ActionHandler) AddPodcast(rssFeedURL string) error {
   rss, err := updateFeed(rssFeedURL)
   if err != nil {
-    log.Printf("Error decode: %v\n", err)
-    return 
+    return err
+    //log.Printf("Error decode: %v\n", err)
   }
 
   fmt.Printf("Channel title: %v added to podcast list\n" , rss.Channel.Title)
@@ -66,6 +67,8 @@ func (h *ActionHandler) AddPodcast(rssFeedURL string) {
 
   h.Podcasts = append(h.Podcasts, podcast)
   h.insert(podcast)
+
+  return nil
 }
 
 func updateFeed(rssFeedURL string) (models.Rss, error) { 
@@ -95,10 +98,10 @@ func (h *ActionHandler) ListPodcast() {
   }
 }
 
-func (h *ActionHandler) ListEpisodes(n int64) {
+func (h *ActionHandler) ListEpisodes(n int64) error {
   if n > int64(len(h.Podcasts))-1 {
     fmt.Println("no such podcast")
-    return
+    return errors.New("no such podcast")
   }
   podcast := h.Podcasts[n]
   for i, item := range podcast.Feed.Channel.Items {
@@ -109,6 +112,8 @@ func (h *ActionHandler) ListEpisodes(n int64) {
       fmt.Printf("\033[1A\033[K")
     }
   }
+
+  return nil
 }
  
 func (h *ActionHandler) RemovePodcast(n int64) {
